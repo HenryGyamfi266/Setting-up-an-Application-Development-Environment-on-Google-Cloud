@@ -1,0 +1,59 @@
+**Task1**-Creating a bucket
+In this section, I create buckets on the cloud platform. Buckets are the basic containers that hold your data in Cloud Storage.
+1. To create a bucket: In the Cloud console, went to Navigation menu > Cloud Storage > Buckets.
+2. Clicked + Create: Cloud Console Storage Browser. 
+3. Entered bucket information and clicked Continue to complete each step:
+4. Entered a unique name for the bucket using my Project ID as the bucket name.
+5. Chose Region for Location type and <filled in at lab start> for Location. Chose Standard for default storage class.
+6. Chose Uniform for Access control and unchecked Enforce public access prevention on this bucket to turn it off.
+7. Left the rest of the fields as their default values and clicked Create. 
+OR use the code below on cloud shell to create a bucket:
+# gcloud storage buckets create gs://<projectID>
+
+**Task2**-Uploading an object into the bucket
+1. To upload the an image into the new bucket: downloaded an image it to my computer. Save the image as kitten.png, renaming it on download.
+2. In the Cloud Storage browser page, clicked the name of the bucket created. In the Objects tab, clicked Upload files. 
+3. In the file dialog, selected the kitten and uploaded it.
+
+**Task3**-Sharing a bucket publicly
+1. To allow public access to the bucket and create a publicly accessible URL for the image: Clicked the Permissions tab above the list of files.
+2. Ensured the view is set to Principals. Clicked Grant Access to view the Add principals pane.
+3. In the New principals box, entered allUsers. In the Select a role drop-down, selected Cloud Storage > Storage Object Viewer. Clicked Save.
+4. Clicked Allow public access.
+
+**Task4**-Creating folders
+1. In the Objects tab, clicked Create folder. Entered folder1 for Name and clicked Create.
+2. Created a subfolder and uploaded a file to it: Clicked folder1.
+3. Clicked Create folder. Entered folder2 for Name and clicked Create. Clicked folder2.
+4. Clicked Upload files. 
+
+**Task5**-Deleting a folder
+1. Clicked the arrow next to Bucket details to return to the buckets level. Selected the bucket. Clicked on the Delete button.
+2. In the window that opened, typed DELETE to confirm the deletion of the folder.
+3. Clicked Delete to permanently delete the folder and all objects and subfolders in it
+
+**Task6**-Creating Virtual Environment with Python
+1. Python virtual environments are used to isolate package installation from the system.
+Here, I Installed the virtualenv environment with code: sudo apt-get install -y virtualenv
+Built the virtual environment with code: python3 -m venv venv
+Activated the virtual environment with code: source venv/bin/activate
+
+Installing the client library
+To install the client Library, I run the code below to install the client library: pip install --upgrade google-cloud-pubsub
+Got the sample code by cloning a GitHub repository: git clone https://github.com/googleapis/python-pubsub.git
+Navigated to the directory: cd python-pubsub/samples/snippets
+
+Pub/Sub - is an asynchronous global messaging service. A publisher creates and sends messages to a topic and a subscriber creates a subscription to a topic to receive messages from it.
+1. In this section, I go ahead to create a topic. In Cloud Shell, the Project ID should automatically be stored in the environment variable GOOGLE_CLOUD_PROJECT, I checked with code: echo $GOOGLE_CLOUD_PROJECT
+2. publisher.py is a script that demonstrates how to perform basic operations on topics with the Cloud Pub/Sub API. To View the content of publisher script, I run the code on cloud shell: cat publisher.py
+3. Run the publisher script to create Pub/Sub Topic: python publisher.py $GOOGLE_CLOUD_PROJECT create MyTopic
+4. To list all Pub/Sub topics in a given project, I run the code: python publisher.py $GOOGLE_CLOUD_PROJECT list
+5. To Create a Pub/Sub subscription for topic with subscriber.py script, I run the code: python subscriber.py $GOOGLE_CLOUD_PROJECT create MyTopic MySub
+
+**Task6**-Testing PubSub
+1. To Publish the message "Hello" to MyTopic, I run the code below in cloud shell:
+# gcloud pubsub topics publish MyTopic --message "Hello"
+2. To Publish a few more messages to MyTopic—run, I run the following commands:
+# gcloud pubsub topics publish MyTopic --message "Publisher's name is Henry Gyamfi"
+3. After publishing messages to MyTopic, I pulled and viewed the messages using MySub. Use MySub to pull the message from MyTopic with code:
+# python subscriber.py $GOOGLE_CLOUD_PROJECT receive MySub

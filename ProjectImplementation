@@ -57,3 +57,66 @@ Pub/Sub - is an asynchronous global messaging service. A publisher creates and s
 # gcloud pubsub topics publish MyTopic --message "Publisher's name is Henry Gyamfi"
 3. After publishing messages to MyTopic, I pulled and viewed the messages using MySub. Use MySub to pull the message from MyTopic with code:
 # python subscriber.py $GOOGLE_CLOUD_PROJECT receive MySub
+
+**Task7**-Creating a function
+Here, I create a simple function named helloWorld. This function writes a message to the Cloud Run functions logs. 
+It is triggered by Cloud Run function events and accepts a callback function used to signal completion of the function.
+For this project the Cloud Run function event is a pub/sub topic event.
+1. To create a Cloud Run function: In Cloud Shell, run the following command to set the default region:
+# gcloud config set run/region REGION
+2. Created a directory for the function code:
+# mkdir gcf_hello_world && cd $_
+3. Created and opened the index.js to edit:
+# nano index.js
+4. Wrote the code below into the index.js file:
+const functions = require('@google-cloud/functions-framework');
+
+// Register a CloudEvent callback with the Functions Framework that will
+// be executed when the Pub/Sub trigger topic receives a message.
+functions.cloudEvent('helloPubSub', cloudEvent => {
+  // The Pub/Sub message is passed as the CloudEvent's data payload.
+  const base64name = cloudEvent.data.message.data;
+
+  const name = base64name
+    ? Buffer.from(base64name, 'base64').toString()
+    : 'World';
+
+  console.log(`Hello, ${name}!`);
+});
+5. Exit nano (Ctrl+x) and save (Y) the file. Created and opened package.json to edit:
+Write the code below into the package.json file:
+
+{
+  "name": "gcf_hello_world",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {
+    "@google-cloud/functions-framework": "^3.0.0"
+  }
+}
+6. Exit nano (Ctrl+x) and save (Y) the file. Installed the package dependencies with code: npm install
+
+**Task8**-Deploying and Testing the Function 
+1. Here, I deploy the helloPubSub function to a pub/sub topic named cf-demo with code:
+gcloud functions deploy nodejs-pubsub-function \
+  --gen2 \
+  --runtime=nodejs20 \
+  --region=REGION \
+  --source=. \
+  --entry-point=helloPubSub \
+  --trigger-topic cf-demo \
+  --stage-bucket PROJECT_ID-bucket \
+  --service-account cloudfunctionsa@PROJECT_ID.iam.gserviceaccount.com \
+  --allow-unauthenticated
+2. Testing the function
+After deploying the function and know that it's active, test that the function writes a message to the cloud log after detecting an event. 
+Invoke the PubSub with some data.
+# gcloud pubsub topics publish cf-demo --message="Cloud Function Gen2"
+
+In the process of Viewing logs
+3. Checking the logs to see my messages in the log history:
+# gcloud functions logs read nodejs-pubsub-function \ --region=REGION 
